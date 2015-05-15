@@ -56,19 +56,21 @@ public class SimRace {
 	
 	private static void usage() {
 		System.out.println(
-				SimRace.class.getSimpleName() + " [AUTOS, RUNDEN]\n" +
+				SimRace.class.getSimpleName() + " [AUTOS, RUNDEN, ZEITMAX]\n" +
 				"\n" +
 				" AUTOS\tDie Anzahl der zu simulierenden Autos\n" +
-				" RUNDEN\tDie Anzahl der zu fahrenden Runden\n"
+				" RUNDEN\tDie Anzahl der zu fahrenden Runden\n" +
+				" ZEITMAX\tDie maximale Zeit, die ein Auto für eine Runde braucht\n"
 		);
 	}
 	
 	public static void main(String... args) {
-		if(args.length == 2) {
+		if(args.length == 3) {
 			try {
 				int autos = Integer.parseInt(args[0]);
 				int runden = Integer.parseInt(args[1]);
-				simulateRace(autos, runden, DEFAULT_RUNDEN_ZEIT);
+				int zeitMax = Integer.parseInt(args[2]);
+				simulateRace(autos, runden, zeitMax);
 			} catch(NumberFormatException e) {
 				System.out.println("Die Parameter müssen Zahlen sein");
 			}

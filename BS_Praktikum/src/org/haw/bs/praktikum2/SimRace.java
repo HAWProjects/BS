@@ -23,6 +23,7 @@ public class SimRace {
 		Thread accidentThread = new Thread(accident);
 		
 		// Alle Autos losfahren lassen
+		System.out.println("Starte Rennen mit " + autos + " Autos für " + runden + " Runden");
 		accidentThread.start();
 		for(Thread thread : threads) {
 			thread.start();

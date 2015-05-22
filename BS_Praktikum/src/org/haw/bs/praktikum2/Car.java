@@ -27,6 +27,7 @@ public class Car implements Runnable {
 	public void run() {
 		while(myRunde < myRundenMax && !Thread.interrupted()) {
 			long roundTime = (long)(Math.random()*myRundenZeitMax);
+			System.out.println(myName + " [" + myRunde + "]: " + roundTime);
 			try {
 				Thread.sleep(roundTime);
 			} catch (InterruptedException e) {

@@ -43,13 +43,9 @@ public class SimRace extends Thread implements AccidentListener_I {
 			for(Car car : myCars) {
 				car.join();
 			}
-		} catch (InterruptedException e) {
-			Thread.currentThread().interrupt();
-			System.out.println("Das Rennen musste aufgrund eines Unfalls abgebrochen werden!");
-		}
-		myAccident.interrupt();
-		
-		if(!Thread.interrupted()) {
+			// Alle Autos im Ziel
+			myAccident.interrupt();
+			
 			// Sortieren nach kleinster Gesamtfahrtzeit
 			Collections.sort(myCars, new Comparator<Car>() {
 				@Override
@@ -64,26 +60,25 @@ public class SimRace extends Thread implements AccidentListener_I {
 				Car car = myCars.get(i);
 				System.out.println((i+1) + ". Platz: " + car.getName() + " (" + car.getGesamtfahrtzeit() + ")");
 			}
+		} catch(InterruptedException e) {
+			for(Car car : myCars) {
+				car.interrupt();
+			}
+			System.out.println("Das Rennen musste aufgrund eines Unfalls abgebrochen werden!");
 		}
 	}
 	
 	@Override
 	public void onAccident() {
 		interrupt();
-		System.out.println("UNFALL!");
-		for(Car car : myCars) {
-			car.interrupt();
-		}
 	}
 	
 	private static void usage() {
-		System.out.println(
-				SimRace.class.getSimpleName() + " [AUTOS, RUNDEN, ZEITMAX]\n" +
-				"\n" +
-				" AUTOS\tDie Anzahl der zu simulierenden Autos\n" +
-				" RUNDEN\tDie Anzahl der zu fahrenden Runden\n" +
-				" ZEITMAX\tDie maximale Zeit, die ein Auto für eine Runde braucht\n"
-		);
+		System.out.println(SimRace.class.getSimpleName() + " [AUTOS, RUNDEN, ZEITMAX]\n"
+		                 + "\n"
+		                 + " AUTOS\tDie Anzahl der zu simulierenden Autos\n"
+		                 + " RUNDEN\tDie Anzahl der zu fahrenden Runden\n"
+		                 + " ZEITMAX\tDie maximale Zeit, die ein Auto für eine Runde braucht\n");
 	}
 	
 	public static void main(String... args) {

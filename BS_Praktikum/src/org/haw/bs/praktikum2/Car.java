@@ -6,7 +6,6 @@ public class Car implements Runnable {
 	private int myRundenZeitMax;
 	
 	private int myRunde;
-	private boolean bImZiel;
 	private long myGesamtfahrtzeit;
 	
 	public Car(String name, int runden, int rundenZeitMax) {
@@ -18,10 +17,6 @@ public class Car implements Runnable {
 	
 	public String getName() {
 		return myName;
-	}
-	
-	public boolean isImZiel() {
-		return bImZiel;
 	}
 	
 	public long getGesamtfahrtzeit() {
@@ -40,6 +35,5 @@ public class Car implements Runnable {
 			myGesamtfahrtzeit += roundTime;
 			myRunde++;
 		}
-		bImZiel = true;
 	}
 }

@@ -19,10 +19,11 @@ public class SimRace {
 			cars.add(car);
 			threads.add(new Thread(car));
 		}
-		Accident accident = new Accident(threads, cars, rundenZeitMax, rundenZeitMax*runden);
+		Accident accident = new Accident(threads, rundenZeitMax, rundenZeitMax*runden);
+		Thread accidentThread = new Thread(accident);
 		
 		// Alle Autos losfahren lassen
-		new Thread(accident).start();
+		accidentThread.start();
 		for(Thread thread : threads) {
 			thread.start();
 		}
@@ -33,6 +34,7 @@ public class SimRace {
 				thread.join();
 			} catch (InterruptedException e) {}
 		}
+		accidentThread.interrupt();
 		
 		if(!accident.isAufgetretenWaehrendRennen()) {
 			// Sortieren nach kleinster Gesamtfahrtzeit
@@ -60,7 +62,7 @@ public class SimRace {
 				"\n" +
 				" AUTOS\tDie Anzahl der zu simulierenden Autos\n" +
 				" RUNDEN\tDie Anzahl der zu fahrenden Runden\n" +
-				" ZEITMAX\tDie maximale Zeit, die ein Auto für eine Runde braucht\n"
+				" ZEITMAX\tDie maximale Zeit, die ein Auto fï¿½r eine Runde braucht\n"
 		);
 	}
 	
@@ -72,7 +74,7 @@ public class SimRace {
 				int zeitMax = Integer.parseInt(args[2]);
 				simulateRace(autos, runden, zeitMax);
 			} catch(NumberFormatException e) {
-				System.out.println("Die Parameter müssen Zahlen sein");
+				System.out.println("Die Parameter mï¿½ssen Zahlen sein");
 			}
 		} else if(args.length == 0) {
 			simulateRace(DEFAULT_ANZAHL_AUTOS, DEFAULT_ANZAHL_RUNDEN, DEFAULT_RUNDEN_ZEIT);

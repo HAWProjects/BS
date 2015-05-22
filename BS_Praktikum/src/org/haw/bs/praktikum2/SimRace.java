@@ -5,7 +5,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
-public class SimRace extends Thread {
+public class SimRace extends Thread implements AccidentListener_I {
 	private static final int DEFAULT_ANZAHL_AUTOS  = 5;
 	private static final int DEFAULT_ANZAHL_RUNDEN = 10;
 	private static final int DEFAULT_RUNDEN_ZEIT   = 100;
@@ -67,7 +67,8 @@ public class SimRace extends Thread {
 		}
 	}
 	
-	public void meldeUnfall() {
+	@Override
+	public void onAccident() {
 		interrupt();
 		System.out.println("UNFALL!");
 		for(Car car : myCars) {

@@ -1,13 +1,13 @@
 package org.haw.bs.praktikum2;
 
 public class Accident extends Thread {
-	private SimRace myRace;
+	private AccidentListener_I myAccidentListener;
 	private int myAccidentZeitpunktMin;
 	private int myAccidentZeitpunktMax;
 	private boolean bAufgetretenWaehrendRennen;
 	
-	public Accident(SimRace race, int accidentZeitpunktMin, int accidentZeitpunktMax) {
-		myRace = race;
+	public Accident(AccidentListener_I accidentListener, int accidentZeitpunktMin, int accidentZeitpunktMax) {
+		myAccidentListener = accidentListener;
 		myAccidentZeitpunktMin = accidentZeitpunktMin;
 		myAccidentZeitpunktMax = accidentZeitpunktMax;
 	}
@@ -21,7 +21,7 @@ public class Accident extends Thread {
 		try {
 			long accidentZeitpunkt = (long)(myAccidentZeitpunktMin + Math.random() * (myAccidentZeitpunktMax-myAccidentZeitpunktMin));
 			Thread.sleep(accidentZeitpunkt);
-			myRace.meldeUnfall();
+			myAccidentListener.onAccident();
 		} catch (InterruptedException e) {}
 	}
 }

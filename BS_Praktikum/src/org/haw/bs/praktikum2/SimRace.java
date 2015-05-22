@@ -5,41 +5,53 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
-public class SimRace {
+public class SimRace extends Thread {
 	private static final int DEFAULT_ANZAHL_AUTOS  = 5;
 	private static final int DEFAULT_ANZAHL_RUNDEN = 10;
 	private static final int DEFAULT_RUNDEN_ZEIT   = 100;
 	
-	private static void simulateRace(int autos, int runden, int rundenZeitMax) {
+	private int myAutos;
+	private int myRunden;
+	
+	private List<Car> myCars;
+	private Accident myAccident;
+	
+	public SimRace(int autos, int runden, int rundenZeitMax) {
+		myAutos = autos;
+		myRunden = runden;
+		
 		// Autos und Threads initialisieren
-		List<Car> cars = new ArrayList<Car>(autos);
-		List<Thread> threads = new ArrayList<Thread>(autos);
+		myCars = new ArrayList<Car>(autos);
 		for(int i=0; i<autos; i++) {
 			Car car = new Car("Auto " + i, runden, rundenZeitMax);
-			cars.add(car);
-			threads.add(new Thread(car));
+			myCars.add(car);
 		}
-		Accident accident = new Accident(threads, rundenZeitMax, rundenZeitMax*runden);
-		Thread accidentThread = new Thread(accident);
-		
+		myAccident = new Accident(this, rundenZeitMax, rundenZeitMax*runden);
+	}
+	
+	@Override
+	public void run() {
 		// Alle Autos losfahren lassen
-		System.out.println("Starte Rennen mit " + autos + " Autos für " + runden + " Runden");
-		accidentThread.start();
-		for(Thread thread : threads) {
-			thread.start();
+		System.out.println("Starte Rennen mit " + myAutos + " Autos für " + myRunden + " Runden");
+		myAccident.start();
+		for(Car car : myCars) {
+			car.start();
 		}
 		
 		// Warten, bis alle Autos fertig sind
-		for(Thread thread : threads) {
-			try {
-				thread.join();
-			} catch (InterruptedException e) {}
+		try {
+			for(Car car : myCars) {
+				car.join();
+			}
+		} catch (InterruptedException e) {
+			Thread.currentThread().interrupt();
+			System.out.println("Das Rennen musste aufgrund eines Unfalls abgebrochen werden!");
 		}
-		accidentThread.interrupt();
+		myAccident.interrupt();
 		
-		if(!accident.isAufgetretenWaehrendRennen()) {
+		if(!Thread.interrupted()) {
 			// Sortieren nach kleinster Gesamtfahrtzeit
-			Collections.sort(cars, new Comparator<Car>() {
+			Collections.sort(myCars, new Comparator<Car>() {
 				@Override
 				public int compare(Car o1, Car o2) {
 					return (int)(o1.getGesamtfahrtzeit()-o2.getGesamtfahrtzeit());
@@ -48,12 +60,18 @@ public class SimRace {
 			
 			// Ergebnisausgabe
 			System.out.println("***** Endstand *****");
-			for(int i=0; i<cars.size(); i++) {
-				Car car = cars.get(i);
+			for(int i=0; i<myCars.size(); i++) {
+				Car car = myCars.get(i);
 				System.out.println((i+1) + ". Platz: " + car.getName() + " (" + car.getGesamtfahrtzeit() + ")");
 			}
-		} else {
-			System.out.println("Das Rennen musste aufgrund eines Unfalls abgebrochen werden!");
+		}
+	}
+	
+	public void meldeUnfall() {
+		interrupt();
+		System.out.println("UNFALL!");
+		for(Car car : myCars) {
+			car.interrupt();
 		}
 	}
 	
@@ -73,12 +91,12 @@ public class SimRace {
 				int autos = Integer.parseInt(args[0]);
 				int runden = Integer.parseInt(args[1]);
 				int zeitMax = Integer.parseInt(args[2]);
-				simulateRace(autos, runden, zeitMax);
+				new SimRace(autos, runden, zeitMax).start();
 			} catch(NumberFormatException e) {
 				System.out.println("Die Parameter müssen Zahlen sein");
 			}
 		} else if(args.length == 0) {
-			simulateRace(DEFAULT_ANZAHL_AUTOS, DEFAULT_ANZAHL_RUNDEN, DEFAULT_RUNDEN_ZEIT);
+			new SimRace(DEFAULT_ANZAHL_AUTOS, DEFAULT_ANZAHL_RUNDEN, DEFAULT_RUNDEN_ZEIT).start();
 		} else {
 			usage();
 		}

@@ -1,15 +1,13 @@
 package org.haw.bs.praktikum2;
 
-import java.util.List;
-
-public class Accident implements Runnable {
-	private List<Thread> myCarThreads;
+public class Accident extends Thread {
+	private SimRace myRace;
 	private int myAccidentZeitpunktMin;
 	private int myAccidentZeitpunktMax;
 	private boolean bAufgetretenWaehrendRennen;
 	
-	public Accident(List<Thread> carThreads, int accidentZeitpunktMin, int accidentZeitpunktMax) {
-		myCarThreads = carThreads;
+	public Accident(SimRace race, int accidentZeitpunktMin, int accidentZeitpunktMax) {
+		myRace = race;
 		myAccidentZeitpunktMin = accidentZeitpunktMin;
 		myAccidentZeitpunktMax = accidentZeitpunktMax;
 	}
@@ -23,11 +21,7 @@ public class Accident implements Runnable {
 		try {
 			long accidentZeitpunkt = (long)(myAccidentZeitpunktMin + Math.random() * (myAccidentZeitpunktMax-myAccidentZeitpunktMin));
 			Thread.sleep(accidentZeitpunkt);
-			System.out.println("UNFALL!");
-			for(Thread thread : myCarThreads) {
-				thread.interrupt();
-			}
-			bAufgetretenWaehrendRennen = true;
+			myRace.meldeUnfall();
 		} catch (InterruptedException e) {}
 	}
 }

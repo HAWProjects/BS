@@ -1,7 +1,6 @@
 package org.haw.bs.praktikum2;
 
-public class Car implements Runnable {
-	private String myName;
+public class Car extends Thread {
 	private final int myRundenMax;
 	private int myRundenZeitMax;
 	
@@ -10,13 +9,9 @@ public class Car implements Runnable {
 	
 	public Car(String name, int runden, int rundenZeitMax) {
 		if(runden <= 0) throw new IllegalArgumentException("Ein Auto muss mindestens eine Runde fahren!");
-		myName = name;
+		setName(name);
 		myRundenMax = runden;
 		myRundenZeitMax = rundenZeitMax;
-	}
-	
-	public String getName() {
-		return myName;
 	}
 	
 	public long getGesamtfahrtzeit() {
@@ -27,7 +22,7 @@ public class Car implements Runnable {
 	public void run() {
 		while(myRunde < myRundenMax && !Thread.interrupted()) {
 			long roundTime = (long)(Math.random()*myRundenZeitMax);
-			System.out.println(myName + " [" + myRunde + "]: " + roundTime);
+			System.out.println(getName() + " [" + myRunde + "]: " + roundTime);
 			try {
 				Thread.sleep(roundTime);
 			} catch (InterruptedException e) {

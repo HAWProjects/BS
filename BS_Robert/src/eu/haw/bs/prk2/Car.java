@@ -19,11 +19,9 @@ public class Car extends Thread implements Comparable<Car> {
 			int lapTime = rand.nextInt(100);
 			raceTime = raceTime + lapTime;
 			try {
-				System.out.println(this.getCarName() + " schlaeft");
 				Thread.sleep(lapTime);
 			} catch (InterruptedException e) {
 				Thread.currentThread().interrupt();
-				System.out.println("Thread wurde unterbrochen: interrupt");
 			}
 		}
 		reachedFinish = true;
@@ -37,26 +35,14 @@ public class Car extends Thread implements Comparable<Car> {
 	public String getCarName() {
 		return carName;
 	}
-	public boolean isFinished(){
+
+	public boolean isFinished() {
 		return reachedFinish;
 	}
 
 	@Override
 	public int compareTo(Car otherCar) {
 		return (int) (this.raceTime - otherCar.raceTime);
-		// int result = 0;
-		// if (this.raceTime < otherCar.raceTime)
-		// {
-		// result = -1;
-		// }
-		// else if (this.raceTime == otherCar.raceTime)
-		// {
-		// result = 0;
-		// }
-		// else if (this.raceTime > otherCar.raceTime)
-		// {
-		// result = 1;
-		// }
-		// return result;
+
 	}
 }

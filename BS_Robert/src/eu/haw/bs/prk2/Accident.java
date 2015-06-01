@@ -16,9 +16,9 @@ public class Accident extends Thread {
 		int accidentTime = rand.nextInt(Start_Race.laps * 100);
 		try {
 			Thread.sleep(accidentTime);
-			System.err.println("accident");
 			for (Car car : carList) {
 				car.interrupt();
+				System.err.println("Accident!");
 			}
 		} catch (InterruptedException e) {
 			e.printStackTrace();

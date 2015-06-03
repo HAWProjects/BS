@@ -2,6 +2,7 @@ package org.haw.bs.praktikum3.ssp;
 
 public class SchereSteinPapierMain extends Thread {
 	private static final int DEFAULT_DAUER_MILLIS = 1000;
+	private static final Tisch DEFAULT_TISCH = new LockedTisch();
 	
 	private Tisch myTisch;
 	private Spieler mySpieler1;
@@ -10,8 +11,8 @@ public class SchereSteinPapierMain extends Thread {
 	
 	private int myDauerMS;
 	
-	public SchereSteinPapierMain(int dauerMS) {
-		myTisch = new Tisch();
+	public SchereSteinPapierMain(int dauerMS, Tisch tisch) {
+		myTisch = tisch;
 		mySpieler1 = new Spieler("Spieler 1", myTisch);
 		mySpieler2 = new Spieler("Spieler 2", myTisch);
 		mySchiedsrichter = new Schiedsrichter(myTisch, mySpieler1, mySpieler2);
@@ -40,8 +41,7 @@ public class SchereSteinPapierMain extends Thread {
 	
 	public static void main(String[] args) {
 		if(args.length == 0) {
-			new SchereSteinPapierMain(DEFAULT_DAUER_MILLIS).start();
+			new SchereSteinPapierMain(DEFAULT_DAUER_MILLIS, DEFAULT_TISCH).start();
 		}
 	}
-	
 }

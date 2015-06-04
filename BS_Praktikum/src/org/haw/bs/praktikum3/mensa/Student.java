@@ -12,12 +12,7 @@ public class Student extends Thread {
 	public void run() {
 		try {
 			while(!Thread.interrupted()) {
-				Kasse anstellkasse = null;
-				for(Kasse kasse : myMensa.getKassen()) {
-					if(anstellkasse == null || anstellkasse.laengeDerSchlange() > kasse.laengeDerSchlange()) {
-						anstellkasse = kasse;
-					}
-				}
+				Kasse anstellkasse = myMensa.getKasseMitKuerzesterSchlange();
 				anstellkasse.anstellen();
 				
 				// Anstehzeit

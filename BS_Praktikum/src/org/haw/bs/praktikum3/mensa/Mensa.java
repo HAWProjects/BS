@@ -1,6 +1,5 @@
 package org.haw.bs.praktikum3.mensa;
 
-import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.locks.ReentrantLock;
@@ -26,22 +25,14 @@ public class Mensa extends Thread {
 		myDauerMillis = dauerMillis;
 	}
 	
-	public List<Kasse> getKassen() {
-		return Collections.unmodifiableList(myKassen);
-	}
-	
-	public Kasse getKasseMitkuerzesterSchlange() throws InterruptedException{
+	public Kasse getKasseMitKuerzesterSchlange() throws InterruptedException {
 		lockKassen.lock();
 		Kasse minKasse = null;
-		int min = Integer.MAX_VALUE;
-		for(Kasse kasse : myKassen){
-				int schlangenLaenge = kasse.laengeDerSchlange();
-				if(schlangenLaenge < min){
-					min = schlangenLaenge;
+		for(Kasse kasse : myKassen) {
+				if(minKasse == null || kasse.laengeDerSchlange() < minKasse.laengeDerSchlange()) {
 					minKasse = kasse;
 				}
 		}
-		minKasse.updtateWarteschlange(1);
 		lockKassen.unlock();
 		return minKasse;
 	}

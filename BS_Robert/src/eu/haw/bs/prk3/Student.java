@@ -1,17 +1,49 @@
 package eu.haw.bs.prk3;
 
-import java.util.LinkedList;
 
 public class Student extends Thread {
-	
-	LinkedList<Kasse> kassenList;
-	
-	public Student(LinkedList<Kasse> kassenList ) {
-		this.kassenList = kassenList;
+
+	//
+	private Mensa mensa;
+
+	/**
+	 * 
+	 * 
+	 * @param kassenListe
+	 */
+	public Student(Mensa mensa) {
+		this.mensa = mensa;
 	}
 
 	@Override
 	public void run() {
-		
+		try {
+			while (!isInterrupted()) {
+
+				Kasse kasse = this.mensa.gibkuerzestenWarteschlange();
+
+				//
+				kasse.sichInDerSchlangeAnStellen();
+				
+				//
+				mensa.aendernWarteschlangeLaenge(kasse);
+				
+				//
+				essenUndWeiterLeben();
+			}
+		} catch (InterruptedException e) {
+			System.err.println(this.getName() + " wurde unterbrochen!");
+		}
+
 	}
+
+	public void essenUndWeiterLeben() throws InterruptedException {
+
+		int dauer = (int) (1000 * Math.random());
+
+		Thread.sleep(dauer);
+
+	}
+	
+
 }

@@ -5,10 +5,12 @@ import java.util.concurrent.locks.ReentrantLock;
 public class Kasse {
 	private String myName;
 	private ReentrantLock myLock;
+	private int warteschlange;
 	
 	public Kasse(String name) {
 		myName = name;
 		myLock = new ReentrantLock(true);
+		this.warteschlange = 0;
 	}
 	
 	public String getName() {
@@ -29,5 +31,9 @@ public class Kasse {
 	public void bezahlen() {
 		System.out.println(Thread.currentThread().getName() + " hat an " + myName + " bezahlt!");
 		myLock.unlock();
+	}
+	
+	public void updtateWarteschlange(int value){
+		this.warteschlange += value;
 	}
 }

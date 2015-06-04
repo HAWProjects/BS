@@ -41,7 +41,7 @@ public class Mensa extends Thread {
 					minKasse = kasse;
 				}
 		}
-		
+		minKasse.updtateWarteschlange(1);
 		lockKassen.unlock();
 		return minKasse;
 	}

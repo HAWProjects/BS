@@ -7,14 +7,11 @@ import java.util.concurrent.locks.ReentrantLock;
 public class Mensa extends Thread {
 	private List<Kasse> myKassen;
 	private List<Student> myStudenten;
+	private ReentrantLock myKassenLock;
 	private int myDauerMillis;
-	
-	private ReentrantLock lockKassen;
 	
 	public Mensa(int kassen, int studenten, int dauerMillis) {
 		myKassen = new LinkedList<>();
-		this.lockKassen = new ReentrantLock();
-		
 		for(int i=0; i<kassen; i++) {
 			myKassen.add(new Kasse("Kasse"+(i+1)));
 		}
@@ -22,18 +19,19 @@ public class Mensa extends Thread {
 		for(int i=0; i<studenten; i++) {
 			myStudenten.add(new Student("Student"+(i+1), this));
 		}
+		myKassenLock = new ReentrantLock();
 		myDauerMillis = dauerMillis;
 	}
 	
 	public Kasse getKasseMitKuerzesterSchlange() throws InterruptedException {
-		lockKassen.lock();
+		myKassenLock.lock();
 		Kasse minKasse = null;
 		for(Kasse kasse : myKassen) {
 				if(minKasse == null || kasse.laengeDerSchlange() < minKasse.laengeDerSchlange()) {
 					minKasse = kasse;
 				}
 		}
-		lockKassen.unlock();
+		myKassenLock.unlock();
 		return minKasse;
 	}
 	

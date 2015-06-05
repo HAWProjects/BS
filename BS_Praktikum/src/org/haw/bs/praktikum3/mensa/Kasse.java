@@ -20,7 +20,7 @@ public class Kasse {
 		myLock.lockInterruptibly();
 		try {
 			synchronized(System.out) {
-				System.out.println(Thread.currentThread().getName() + " darf an " + myName + " bezahlen!");
+				System.out.println(Thread.currentThread().getName() + " hat an " + myName + " bezahlt!");
 			}
 			Thread.sleep(1000);
 		} finally {
@@ -42,7 +42,7 @@ public class Kasse {
 	public void verlassen() {
 		myWarteschlange--;
 		synchronized(System.out) {
-			System.out.println(Thread.currentThread().getName() + " hat an " + myName + " bezahlt!");
+			System.out.println(Thread.currentThread().getName() + " hat " + myName + " verlassen!");
 		}
 	}
 }

@@ -19,20 +19,26 @@ public class Mensa extends Thread {
 		for(int i=0; i<studenten; i++) {
 			myStudenten.add(new Student("Student"+(i+1), this));
 		}
-		myKassenLock = new ReentrantLock();
+		myKassenLock = new ReentrantLock(true);
 		myDauerMillis = dauerMillis;
 	}
 	
-	public Kasse getKasseMitKuerzesterSchlange() throws InterruptedException {
-		myKassenLock.lock();
+	public void bezahlen() throws InterruptedException {
+		myKassenLock.lockInterruptibly();
 		Kasse minKasse = null;
 		for(Kasse kasse : myKassen) {
-				if(minKasse == null || kasse.laengeDerSchlange() < minKasse.laengeDerSchlange()) {
-					minKasse = kasse;
-				}
+			if(minKasse == null || kasse.laengeDerSchlange() < minKasse.laengeDerSchlange()) {
+				minKasse = kasse;
+			}
 		}
+		minKasse.anstellen();
 		myKassenLock.unlock();
-		return minKasse;
+		
+		minKasse.bezahlen();
+		
+		myKassenLock.lockInterruptibly();
+		minKasse.verlassen();
+		myKassenLock.unlock();
 	}
 	
 	@Override

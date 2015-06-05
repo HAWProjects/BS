@@ -10,28 +10,39 @@ public class Kasse {
 	public Kasse(String name) {
 		myName = name;
 		myLock = new ReentrantLock(true);
-		myWarteschlange = 0;
 	}
 	
 	public String getName() {
 		return myName;
 	}
 	
-	public void anstellen() throws InterruptedException {
-		System.out.println(Thread.currentThread().getName() + " hat sich an " + myName + " angestellt!");
-		myWarteschlange++;
+	public void bezahlen() throws InterruptedException {
 		myLock.lockInterruptibly();
-		System.out.println(Thread.currentThread().getName() + " darf an " + myName + " bezahlen!");
-//		System.out.println("\t\t\t\t\t\t\t(" + laengeDerSchlange() + ") Studenten an " + myName);
+		try {
+			synchronized(System.out) {
+				System.out.println(Thread.currentThread().getName() + " darf an " + myName + " bezahlen!");
+			}
+			Thread.sleep(1000);
+		} finally {
+			myLock.unlock();
+		}
 	}
 	
 	public int laengeDerSchlange() throws InterruptedException {
 		return myWarteschlange;
 	}
 	
-	public void bezahlen() {
-		System.out.println(Thread.currentThread().getName() + " hat an " + myName + " bezahlt!");
+	public void anstellen() {
+		myWarteschlange++;
+		synchronized(System.out) {
+			System.out.println(Thread.currentThread().getName() + " hat sich an " + myName + " angestellt!");
+		}
+	}
+	
+	public void verlassen() {
 		myWarteschlange--;
-		myLock.unlock();
+		synchronized(System.out) {
+			System.out.println(Thread.currentThread().getName() + " hat an " + myName + " bezahlt!");
+		}
 	}
 }

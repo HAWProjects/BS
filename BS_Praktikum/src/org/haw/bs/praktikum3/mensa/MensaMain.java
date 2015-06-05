@@ -2,7 +2,7 @@ package org.haw.bs.praktikum3.mensa;
 
 public class MensaMain {
 	private static final int DEFAULT_ANZAHL_KASSEN = 4;
-	private static final int DEFAULT_ANZAHL_STUDENTEN = 10;
+	private static final int DEFAULT_ANZAHL_STUDENTEN = 20;
 	private static final int DEFAULT_DAUER_MILLIS = 5000;
 	
 	public static void usage() {

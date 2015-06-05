@@ -12,13 +12,7 @@ public class Student extends Thread {
 	public void run() {
 		try {
 			while(!Thread.interrupted()) {
-				Kasse anstellkasse = myMensa.getKasseMitKuerzesterSchlange();
-				anstellkasse.anstellen();
-				
-				// Anstehzeit
-				Thread.sleep((int)(Math.random()*1000));
-				
-				anstellkasse.bezahlen();
+				myMensa.bezahlen();
 				
 				// Essen
 				Thread.sleep((int)(Math.random()*5000));

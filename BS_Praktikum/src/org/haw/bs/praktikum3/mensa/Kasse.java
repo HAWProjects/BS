@@ -19,9 +19,7 @@ public class Kasse {
 	public void bezahlen() throws InterruptedException {
 		myLock.lockInterruptibly();
 		try {
-			synchronized(System.out) {
-				System.out.println(Thread.currentThread().getName() + " hat an " + myName + " bezahlt!");
-			}
+			System.out.println("[*] " + Thread.currentThread().getName() + " bezahlt an " + myName + "!");
 			Thread.sleep(1000);
 		} finally {
 			myLock.unlock();
@@ -34,15 +32,11 @@ public class Kasse {
 	
 	public void anstellen() {
 		myWarteschlange++;
-		synchronized(System.out) {
-			System.out.println(Thread.currentThread().getName() + " hat sich an " + myName + " angestellt!");
-		}
+		System.out.println("[+] " + Thread.currentThread().getName() + " hat sich an " + myName + " angestellt!");
 	}
 	
 	public void verlassen() {
 		myWarteschlange--;
-		synchronized(System.out) {
-			System.out.println(Thread.currentThread().getName() + " hat " + myName + " verlassen!");
-		}
+		System.out.println("[-] " + Thread.currentThread().getName() + " hat " + myName + " verlassen!");
 	}
 }

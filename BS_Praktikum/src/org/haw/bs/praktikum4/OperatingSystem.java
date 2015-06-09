@@ -307,8 +307,50 @@ public class OperatingSystem {
 	 *         Zugriffsfehler
 	 */
 	public synchronized int read(int pid, int virtAdr) {
-	// TODO
-	
+		// übergebene Adresse prüfen
+		if ((virtAdr < 0) || (virtAdr > VIRT_ADR_SPACE - WORD_SIZE)) {
+			System.err.println("OS: write ERROR " + pid + ": Adresse " + virtAdr + " liegt außerhalb des virtuellen Adressraums 0 - " + VIRT_ADR_SPACE);
+			return -1;
+		}
+		
+		// Seitenadresse berechnen
+		int virtualPageNum = getVirtualPageNum(virtAdr);
+		int offset = getOffset(virtAdr);
+		testOut("OS: read " + pid + " " + virtAdr + " +++ Seitennr.: " + virtualPageNum + " Offset: " + offset);
+		
+		// Seite in Seitentabelle referenzieren
+		Process proc = getProcess(pid);
+		PageTableEntry pte = proc.pageTable.getPte(virtualPageNum);
+		if (pte == null) {
+			// Seite nicht vorhanden:
+			testOut("OS: read " + pid + " +++ Seitennr.: " + virtualPageNum + " in Seitentabelle nicht vorhanden");
+			pte = new PageTableEntry();
+			pte.virtPageNum = virtualPageNum;
+			// Seitenrahmen im RAM für die neue Seite anfordern und reale (RAM-)SeitenAdresse eintragen
+			pte.realPageFrameAdr = getNewRAMPage(pte, pid);
+			pte.valid = true;
+			// neue Seite in Seitentabelle eintragen
+			proc.pageTable.addEntry(pte);
+			testOut("OS: read " + pid + " Neue Seite " + virtualPageNum + " in Seitentabelle eingetragen! RAM-Adr.: " + pte.realPageFrameAdr);
+		} else {
+			// Seite vorhanden: Seite valid (im RAM)?
+			if (!pte.valid) {
+				// Seite nicht valid (also auf Platte --> Seitenfehler):
+				pte = handlePageFault(pte, pid);
+			}
+		}
+		// ------ Zustand: Seite ist in Seitentabelle und im RAM vorhanden
+		
+		// Reale Adresse des Datenworts berechnen
+		int realAddressOfItem = pte.realPageFrameAdr + offset;
+		// Datenwort aus RAM lesen
+		int item = readFromRAM(realAddressOfItem);
+		testOut("OS: read " + pid + " +++ item: " + item + " erfolgreich aus virt. Adresse " + virtAdr + " gelesen! RAM-Adresse: " + realAddressOfItem + " \n");
+		// Seitentabelle bzgl. Zugriffshistorie aktualisieren
+		pte.referenced = true;
+		// Statistische Zählung
+		eventLog.incrementWriteAccesses();
+		return item;
 	}
 
 	// --------------- Private Methoden des Betriebssystems
@@ -328,7 +370,7 @@ public class OperatingSystem {
 	 * @return Die entsprechende virtuelle Seitennummer
 	 */
 	private int getVirtualPageNum(int virtAdr) {
-		// TODO
+		return virtAdr / PAGE_SIZE;
 	}
 
 	/**
@@ -337,7 +379,7 @@ public class OperatingSystem {
 	 * @return Den entsprechenden Offset zur Berechnung der realen Adresse
 	 */
 	private int getOffset(int virtAdr) {
-		// TODO
+		return virtAdr % PAGE_SIZE;
 	}
 
 	/**

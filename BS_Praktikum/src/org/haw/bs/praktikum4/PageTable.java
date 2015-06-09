@@ -155,11 +155,12 @@ public class PageTable {
 	}
 
 	/**
-	 * RANDOM-Algorithmus: Zuf�llige Auswahl
+	 * RANDOM-Algorithmus: Zufällige Auswahl
 	 */
 	private PageTableEntry randomAlgorithm(PageTableEntry newPte) {
-		// TODO
-		
+		int pteRandomIndex = (int)(Math.random()*pteRAMlist.size());
+		PageTableEntry pte = pteRAMlist.remove(pteRandomIndex);
+		pteRAMlist.add(pteRandomIndex, newPte);
 		return pte;
 	}
 

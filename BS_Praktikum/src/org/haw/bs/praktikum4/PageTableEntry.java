@@ -7,7 +7,6 @@ package org.haw.bs.praktikum4;
  * 
  */
 public class PageTableEntry {
-
 	/**
 	 *	virtPageNum: Virtuelle Seitennummer (VSN - engl. VPN) 
 	 */
@@ -53,6 +52,4 @@ public class PageTableEntry {
 				+ ", realPageFrameAdr=" + realPageFrameAdr + ", valid=" + valid
 				+ ", referenced=" + referenced + ", modified=" + modified + "]";
 	}
-	
-	
 }

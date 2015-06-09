@@ -20,7 +20,7 @@ public class Statistics {
 	}
 
 	/**
-	 * Alle Statistik-Z�hler zur�cksetzen
+	 * Alle Statistik-Zähler zurücksetzen
 	 */
 	public synchronized void resetCounter() {
 		pageFaults = 0;
@@ -66,21 +66,21 @@ public class Statistics {
 	}
 
 	/**
-	 * Seitenfehler z�hlen
+	 * Seitenfehler zählen
 	 */
 	public synchronized void incrementPageFaults() {
 		pageFaults++;
 	}
 
 	/**
-	 * Lesezugriff z�hlen
+	 * Lesezugriff zählen
 	 */
 	public synchronized void incrementReadAccesses() {
 		readAccesses++;
 	}
 
 	/**
-	 * Schreibzugriff z�hlen
+	 * Schreibzugriff zählen
 	 */
 	public synchronized void incrementWriteAccesses() {
 		writeAccesses++;

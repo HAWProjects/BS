@@ -3,15 +3,14 @@ package org.haw.bs.praktikum4;
 /**
  * FreeListBlock
  *
- * Datenstrukturelement einer Freibereichsliste, das Adresse und Gr��e eines freien Blocks angibt
+ * Datenstrukturelement einer Freibereichsliste, das Adresse und Größe eines freien Blocks angibt
  */
 public class FreeListBlock implements Comparable<Object> {
 	private int adress;		// Reale Startadresse des freien Blocks
-	private int size;		// L�nge des freien Blocks in Byte
+	private int size;		// Länge des freien Blocks in Byte
 
 	/**
 	 * Konstruktor
-	 *
 	 */	
 	public FreeListBlock(int curAdr, int curSize) {
 		adress = curAdr;
@@ -19,11 +18,10 @@ public class FreeListBlock implements Comparable<Object> {
 	}
 
 	/**
-	 * Vergleichsfunktion f�r Sortierung
+	 * Vergleichsfunktion für Sortierung
 	 */	
-
 	public int compareTo(Object otherBlock) {
-		// Vergleiche mit anderem FreeListBlock f�r die Sortierung
+		// Vergleiche mit anderem FreeListBlock für die Sortierung
 		return this.getAdress() - ((FreeListBlock) otherBlock).getAdress();
 	}
 	
@@ -35,7 +33,7 @@ public class FreeListBlock implements Comparable<Object> {
 	}
 
 	/**
-	 * @return Gr��e des Blocks
+	 * @return Größe des Blocks
 	 */
 	public int getSize() {
 		return size;
@@ -49,7 +47,7 @@ public class FreeListBlock implements Comparable<Object> {
 	}
 
 	/**
-	 * @param i Gr��e zuweisen
+	 * @param i Größe zuweisen
 	 */
 	public void setSize(int i) {
 		size = i;

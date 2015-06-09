@@ -11,7 +11,7 @@ import java.util.*;
  */
 public class PageTable {
 	/**
-	 * Die Seitentabelle als ArrayList von Seitentabelleneintr�gen
+	 * Die Seitentabelle als ArrayList von Seitentabelleneinträgen
 	 * (PageTableEntry). Die Seitentabelle darf nicht sortiert werden!
 	 */
 	private ArrayList<PageTableEntry> pageTable;
@@ -22,7 +22,7 @@ public class PageTable {
 	private LinkedList<PageTableEntry> pteRAMlist;
 
 	/**
-	 * Uhrzeiger f�r Clock-Algorithmus
+	 * Uhrzeiger für Clock-Algorithmus
 	 */
 	private int pteRAMlistIndex;
 
@@ -42,21 +42,18 @@ public class PageTable {
 	public PageTable(OperatingSystem currentOS, int myPID) {
 		os = currentOS;
 		pid = myPID;
-		// Die Seitentabelle erzeugen
 		pageTable = new ArrayList<PageTableEntry>();
-		// Die Liste auf RAM-Seiteneintr�ge erzeugen
 		pteRAMlist = new LinkedList<PageTableEntry>();
 		pteRAMlistIndex = 0;
 	}
 
 	/**
-	 * R�ckgabe: Seitentabelleneintrag pte (PageTableEntry) f�r die �bergebene
+	 * Rückgabe: Seitentabelleneintrag pte (PageTableEntry) für die übergebene
 	 * virtuelle Seitennummer (VPN = Virtual Page Number) oder null, falls Seite
 	 * nicht existiert
 	 */
 	public PageTableEntry getPte(int vpn) {
 		if ((vpn < 0) || (vpn >= pageTable.size())) {
-			// R�ckgabe null, da Seite nicht existiert!
 			return null;
 		} else {
 			return pageTable.get(vpn);
@@ -64,7 +61,7 @@ public class PageTable {
 	}
 
 	/**
-	 * Einen Eintrag (PageTableEntry) an die Seitentabelle anh�ngen. Die
+	 * Einen Eintrag (PageTableEntry) an die Seitentabelle anhängen. Die
 	 * Seitentabelle darf nicht sortiert werden!
 	 */
 	public void addEntry(PageTableEntry pte) {
@@ -72,7 +69,7 @@ public class PageTable {
 	}
 
 	/**
-	 * R�ckgabe: Aktuelle Gr��e der Seitentabelle.
+	 * Rückgabe: Aktuelle Größe der Seitentabelle.
 	 */
 	public int getSize() {
 		return pageTable.size();
@@ -80,15 +77,15 @@ public class PageTable {
 
 	/**
 	 * Pte in pteRAMlist eintragen, wenn sich die Zahl der RAM-Seiten des
-	 * Prozesses erh�ht hat.
+	 * Prozesses erhöht hat.
 	 */
 	public void pteRAMlistInsert(PageTableEntry pte) {
 		pteRAMlist.add(pte);
 	}
 
 	/**
-	 * Eine Seite, die sich im RAM befindet, anhand der pteRAMlist ausw�hlen und
-	 * zur�ckgeben
+	 * Eine Seite, die sich im RAM befindet, anhand der pteRAMlist auswählen und
+	 * zurückgeben
 	 */
 	public PageTableEntry selectNextRAMpteAndReplace(PageTableEntry newPte) {
 		if (os.getReplacementAlgorithm() == OperatingSystem.ImplementedReplacementAlgorithms.CLOCK) {
@@ -103,25 +100,22 @@ public class PageTable {
 	}
 
 	/**
-	 * FIFO-Algorithmus: Auswahl = Listenkopf (1. Element) Anschlie�end
-	 * Listenkopf l�schen, neue Seite (newPte) an Liste anh�ngen
+	 * FIFO-Algorithmus: Auswahl = Listenkopf (1. Element) Anschließend
+	 * Listenkopf löschen, neue Seite (newPte) an Liste anhängen
 	 */
 	private PageTableEntry fifoAlgorithm(PageTableEntry newPte) {
-		PageTableEntry pte; // Auswahl
-
-		pte = (PageTableEntry) pteRAMlist.getFirst();
-		os.testOut("Prozess " + pid + ": FIFO-Algorithmus hat pte ausgew�hlt: "
-				+ pte.virtPageNum);
+		PageTableEntry pte = (PageTableEntry) pteRAMlist.getFirst();
+		os.testOut("Prozess " + pid + ": FIFO-Algorithmus hat pte ausgewählt: " + pte.virtPageNum);
 		pteRAMlist.removeFirst();
 		pteRAMlist.add(newPte);
 		return pte;
 	}
 
 	/**
-	 * CLOCK-Algorithmus (Second-Chance): N�chstes Listenelement, ausgehend vom
-	 * aktuellen Index, mit Referenced-Bit = 0 (false) ausw�hlen Sonst R-Bit auf
-	 * 0 setzen und n�chstes Element in der pteRAMlist untersuchen. Anschlie�end
-	 * die ausgew�hlte Seite durch die neue Seite (newPte) am selben Listenplatz
+	 * CLOCK-Algorithmus (Second-Chance): Nächstes Listenelement, ausgehend vom
+	 * aktuellen Index, mit Referenced-Bit = 0 (false) auswählen Sonst R-Bit auf
+	 * 0 setzen und nächstes Element in der pteRAMlist untersuchen. Anschließend
+	 * die ausgewählte Seite durch die neue Seite (newPte) am selben Listenplatz
 	 * ersetzen
 	 */
 	private PageTableEntry clockAlgorithm(PageTableEntry newPte) {
@@ -130,26 +124,22 @@ public class PageTable {
 		// Immer ab altem "Uhrzeigerstand" weitersuchen
 		pte = (PageTableEntry) pteRAMlist.get(pteRAMlistIndex);
 
-		// Suche den n�chsten Eintrag mit referenced == false (R-Bit = 0)
+		// Suche den nächsten Eintrag mit referenced == false (R-Bit = 0)
 		while (pte.referenced == true) {
-			// Seite wurde referenziert, also nicht ausw�hlen, sondern R-Bit
-			// zur�cksetzen
-			os.testOut("Prozess " + pid + ": CLOCK-Algorithmus! --- pte.vpn: "
-					+ pte.virtPageNum + " ref: " + pte.referenced);
+			// Seite wurde referenziert, also nicht auswählen, sondern R-Bit zurücksetzen
+			os.testOut("Prozess " + pid + ": CLOCK-Algorithmus! --- pte.vpn: " + pte.virtPageNum + " ref: " + pte.referenced);
 			pte.referenced = false;
 			incrementPteRAMlistIndex();
 			pte = (PageTableEntry) pteRAMlist.get(pteRAMlistIndex);
 		}
 
-		// Seite ausgew�hlt! (--> pteRAMlistIndex)
+		// Seite ausgewählt! (--> pteRAMlistIndex)
 		// Alte Seite gegen neue in pteRAMlist austauschen
 		pteRAMlist.remove(pteRAMlistIndex);
 		pteRAMlist.add(pteRAMlistIndex, newPte);
 		// Index auf Nachfolger setzen
 		incrementPteRAMlistIndex();
-		os.testOut("Prozess " + pid
-				+ ": CLOCK-Algorithmus hat pte ausgew�hlt: " + pte.virtPageNum
-				+ "  Neuer pteRAMlistIndex ist " + pteRAMlistIndex);
+		os.testOut("Prozess " + pid + ": CLOCK-Algorithmus hat pte ausgewählt: " + pte.virtPageNum + "  Neuer pteRAMlistIndex ist " + pteRAMlistIndex);
 
 		return pte;
 	}
@@ -160,16 +150,16 @@ public class PageTable {
 	private PageTableEntry randomAlgorithm(PageTableEntry newPte) {
 		int pteRandomIndex = (int)(Math.random()*pteRAMlist.size());
 		PageTableEntry pte = pteRAMlist.remove(pteRandomIndex);
+		os.testOut("Prozess " + pid + ": RANDOM-Algorithmus hat pte ausgewählt: " + pte.virtPageNum);
 		pteRAMlist.add(pteRandomIndex, newPte);
 		return pte;
 	}
 
 	// ----------------------- Hilfsmethode --------------------------------
 	/**
-	 * ramPteIndex zirkular hochz�hlen zwischen 0 .. Listengr��e-1
+	 * ramPteIndex zirkular hochzählen zwischen 0 .. Listengröße-1
 	 */
 	private void incrementPteRAMlistIndex() {
 		pteRAMlistIndex = (pteRAMlistIndex + 1) % pteRAMlist.size();
 	}
-
 }

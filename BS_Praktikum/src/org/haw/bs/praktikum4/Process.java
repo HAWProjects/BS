@@ -3,33 +3,32 @@ package org.haw.bs.praktikum4;
 /*
  * Process
  *
- * Repr�sentation eines unabh�ngigen Prozess-Objekts
+ * Repräsentation eines unabhängigen Prozess-Objekts
  */
 
 /**
  * Programm-Simulation:
  * 
  * Daten eines Prozesses verwalten (PCB) sowie Laufzeitverhalten simulieren,
- * d.h. read-Operationen im eigenen virtuellen Speicher ausf�hren
+ * d.h. read-Operationen im eigenen virtuellen Speicher ausführen
  * (Pseudo-Zufallszahlengeneratorgesteuert) mit mehreren Operationen im selben
- * Seitenbereich (gem�� "Lokalit�tsfaktor")
+ * Seitenbereich (gemäß "Lokalitätsfaktor")
  */
 public class Process extends Thread {
-
 	/**
-	 * Speicherbedarf f�r das gesamte Programm (in Byte)
+	 * Speicherbedarf für das gesamte Programm (in Byte)
 	 */
 	private int processSize;
 
 	/**
-	 * Dieser Faktor bestimmt das "Lokalit�tsverhalten" eines Programms (=
-	 * Anzahl Operationen innerhalb eines Seitenbereichs) Setzen �ber
+	 * Dieser Faktor bestimmt das "Lokalitätsverhalten" eines Programms (=
+	 * Anzahl Operationen innerhalb eines Seitenbereichs) Setzen über
 	 * os.getDEFAULT_LOCALITY_FACTOR()
 	 */
 	private int localityFactor;
 
 	/**
-	 * Dieser Faktor bestimmt das "Lokalit�tsverhalten" eines Programms = max.
+	 * Dieser Faktor bestimmt das "Lokalitätsverhalten" eines Programms = max.
 	 * Streuung (+/-) bei lokalen Operationen in Anzahl Seiten
 	 */
 	private static final int BIAS_FACTOR = 2;
@@ -46,7 +45,7 @@ public class Process extends Thread {
 	public PageTable pageTable;
 
 	// ---------- Prozess-Variablen ------------------------------
-	private OperatingSystem os; // Handle f�r System Calls
+	private OperatingSystem os; // Handle für System Calls
 
 	/**
 	 * Konstruktor
@@ -65,10 +64,10 @@ public class Process extends Thread {
 	 * 
 	 */
 	public void run() {
-		int median; // Mittelwert f�r virtuelle Adressen
+		int median; // Mittelwert für virtuelle Adressen
 		int bias; // Streuung um den Mittelwert
 		int virtAdr; // Virtuelle Adresse
-		int i; // Z�hler
+		int i; // Zähler
 
 		// Streuungsbereich festlegen (Anzahl Seiten)
 		bias = BIAS_FACTOR * os.getPAGE_SIZE();
@@ -78,10 +77,10 @@ public class Process extends Thread {
 			// liegen!)
 			median = (int) (processSize * Math.random());
 
-			// Neue Adresse als Mittelwert f�r die n�chsten Zugriffe verwenden
+			// Neue Adresse als Mittelwert für die nächsten Zugriffe verwenden
 			// (localityFactor)
 			for (i = 0; i < localityFactor; i++) {
-				// Virtuelle Adresse in der "N�he" des Mittelwerts (median) bestimmen
+				// Virtuelle Adresse in der "Nähe" des Mittelwerts (median) bestimmen
 				virtAdr = ((int) (2 * bias * Math.random() - bias)) + median;
 				// Grenzen setzen: 0 <= virtAdr <= PROGRAM_SIZE -
 				// os.getWORD_SIZE() !!
@@ -94,6 +93,5 @@ public class Process extends Thread {
 				os.read(pid, virtAdr);
 			}
 		}
-
 	}
 }

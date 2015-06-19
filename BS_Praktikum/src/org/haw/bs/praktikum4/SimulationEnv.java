@@ -63,6 +63,7 @@ public class SimulationEnv {
 				break;
 			}
 		}
+		
 		// Laufzeit abwarten
 		try {
 			Thread.sleep(simulationTime);

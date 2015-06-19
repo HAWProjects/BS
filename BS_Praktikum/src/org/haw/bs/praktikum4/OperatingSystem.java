@@ -236,9 +236,11 @@ public class OperatingSystem {
 			System.err.println("OS: write ERROR " + pid + ": Adresse " + virtAdr + " liegt außerhalb des virtuellen Adressraums 0 - " + VIRT_ADR_SPACE);
 			return -1;
 		}
+		
 		// Seitenadresse berechnen
 		int virtualPageNum = getVirtualPageNum(virtAdr);
 		int offset = getOffset(virtAdr);
+		
 		testOut("OS: write " + pid + " " + virtAdr + " " + item + " +++ Seitennr.: " + virtualPageNum + " Offset: " + offset);
 
 		// Seite in Seitentabelle referenzieren
@@ -247,33 +249,42 @@ public class OperatingSystem {
 		if (pte == null) {
 			// Seite nicht vorhanden:
 			testOut("OS: write " + pid + " +++ Seitennr.: " + virtualPageNum + " in Seitentabelle nicht vorhanden");
+			
 			pte = new PageTableEntry();
 			pte.virtPageNum = virtualPageNum;
-			// Seitenrahmen im RAM für die neue Seite anfordern und reale
-			// (RAM-)SeitenAdresse eintragen
+			
+			// Seitenrahmen im RAM für die neue Seite anfordern und reale (RAM-)SeitenAdresse eintragen
 			pte.realPageFrameAdr = getNewRAMPage(pte, pid);
 			pte.valid = true;
+			
 			// neue Seite in Seitentabelle eintragen
 			proc.pageTable.addEntry(pte);
+			
 			testOut("OS: write " + pid + " Neue Seite " + virtualPageNum + " in Seitentabelle eingetragen! RAM-Adr.: " + pte.realPageFrameAdr);
 		} else {
-			// Seite vorhanden: Seite valid (im RAM)?
+			// Seite vorhanden: Seite valid (also im RAM)?
 			if (!pte.valid) {
 				// Seite nicht valid (also auf Platte --> Seitenfehler):
 				pte = handlePageFault(pte, pid);
 			}
 		}
+		
 		// ------ Zustand: Seite ist in Seitentabelle und im RAM vorhanden
 
 		// Reale Adresse des Datenworts berechnen
 		int realAddressOfItem = pte.realPageFrameAdr + offset;
+		
 		// Datenwort in RAM eintragen
 		writeToRAM(realAddressOfItem, item);
+		
 		testOut("OS: write " + pid + " +++ item: " + item + " erfolgreich an virt. Adresse " + virtAdr + " geschrieben! RAM-Adresse: " + realAddressOfItem + " \n");
+		
 		// Seitentabelle bzgl. Zugriffshistorie aktualisieren
 		pte.referenced = true;
+		
 		// Statistische Zählung
 		eventLog.incrementWriteAccesses();
+		
 		return 0;
 	}
 
@@ -297,6 +308,7 @@ public class OperatingSystem {
 		// Seitenadresse berechnen
 		int virtualPageNum = getVirtualPageNum(virtAdr);
 		int offset = getOffset(virtAdr);
+		
 		testOut("OS: read " + pid + " " + virtAdr + " +++ Seitennr.: " + virtualPageNum + " Offset: " + offset);
 		
 		// Seite in Seitentabelle referenzieren
@@ -305,32 +317,42 @@ public class OperatingSystem {
 		if (pte == null) {
 			// Seite nicht vorhanden:
 			testOut("OS: read " + pid + " +++ Seitennr.: " + virtualPageNum + " in Seitentabelle nicht vorhanden");
+			
 			pte = new PageTableEntry();
 			pte.virtPageNum = virtualPageNum;
+			
 			// Seitenrahmen im RAM für die neue Seite anfordern und reale (RAM-)SeitenAdresse eintragen
 			pte.realPageFrameAdr = getNewRAMPage(pte, pid);
 			pte.valid = true;
+			
 			// neue Seite in Seitentabelle eintragen
 			proc.pageTable.addEntry(pte);
+			
 			testOut("OS: read " + pid + " Neue Seite " + virtualPageNum + " in Seitentabelle eingetragen! RAM-Adr.: " + pte.realPageFrameAdr);
 		} else {
-			// Seite vorhanden: Seite valid (im RAM)?
+			// Seite vorhanden: Seite valid (also im RAM)?
 			if (!pte.valid) {
 				// Seite nicht valid (also auf Platte --> Seitenfehler):
 				pte = handlePageFault(pte, pid);
 			}
 		}
+		
 		// ------ Zustand: Seite ist in Seitentabelle und im RAM vorhanden
 		
 		// Reale Adresse des Datenworts berechnen
 		int realAddressOfItem = pte.realPageFrameAdr + offset;
+		
 		// Datenwort aus RAM lesen
 		int item = readFromRAM(realAddressOfItem);
+		
 		testOut("OS: read " + pid + " +++ item: " + item + " erfolgreich aus virt. Adresse " + virtAdr + " gelesen! RAM-Adresse: " + realAddressOfItem + " \n");
+		
 		// Seitentabelle bzgl. Zugriffshistorie aktualisieren
 		pte.referenced = true;
+		
 		// Statistische Zählung
 		eventLog.incrementWriteAccesses();
+		
 		return item;
 	}
 
@@ -373,22 +395,23 @@ public class OperatingSystem {
 	 * @return modifizierter Seitentabelleneintrag
 	 */
 	private PageTableEntry handlePageFault(PageTableEntry pte, int pid) {
-		int newPageFrameAdr; // Reale Adresse einer neuen Seite im RAM
-
 		testOut("OS: " + pid + " +++ Seitenfehler für Seite " + pte.virtPageNum);
 		eventLog.incrementPageFaults(); // Statistische Zählung
+		
 		// neue Seite im RAM anfordern (ggf. alte Seite verdrängen!)
-		newPageFrameAdr = getNewRAMPage(pte, pid);
-		// Seite von Platte in neue RAM-Seite lesen (realPageAdr muss
-		// Plattenblockadresse gewesen sein!)
+		int newPageFrameAdr = getNewRAMPage(pte, pid); // Reale Adresse einer neuen Seite im RAM
+		
+		// Seite von Platte in neue RAM-Seite lesen (realPageAdr muss Plattenblockadresse gewesen sein!)
 		dataTransferFromDisk(pte.realPageFrameAdr, newPageFrameAdr);
+		
 		// Plattenblock freigeben
 		freeDiskBlock(pte.realPageFrameAdr);
+		
 		// Seitentabelle aktualisieren
 		pte.realPageFrameAdr = newPageFrameAdr;
 		pte.valid = true;
-		testOut("OS: " + pid + " +++ Seite " + pte.virtPageNum
-				+ " ist wieder im RAM mit Startadresse " + pte.realPageFrameAdr);
+		
+		testOut("OS: " + pid + " +++ Seite " + pte.virtPageNum + " ist wieder im RAM mit Startadresse " + pte.realPageFrameAdr);
 
 		return pte;
 	}
@@ -418,30 +441,31 @@ public class OperatingSystem {
 		Process proc = getProcess(pid);
 		// Anforderung einer neuen RAM-Seite erfüllbar?
 		if (proc.pageTable.getSize() < MAX_RAM_PAGES_PER_PROCESS) {
-			// Ja, Seitenanforderung im RAM ist erfüllbar:
-			// neue Seite belegen und Adresse zurückgeben
+			// Ja, Seitenanforderung im RAM ist erfüllbar: neue Seite belegen und Adresse zurückgeben
 			newPageFrameAdr = allocateRAMPage();
+			
 			// Liste der RAM-Seiten für den Prozess erweitern
 			proc.pageTable.pteRAMlistInsert(newPte);
 		} else {
 			// Nein, Seitenanforderung im RAM ist nicht erfüllbar:
 			testOut("OS: getNewRAMPage " + pid + " ++ Seitenfehler für Seite " + newPte.virtPageNum + " --> Seitenersetzungs-Algorithmus!");
-			// eine alte Seite zur Verdrängung auswählen -->
-			// Seitenersetzungs-Algorithmus
+			
+			// eine alte Seite zur Verdrängung auswählen --> Seitenersetzungs-Algorithmus
 			PageTableEntry replacePte = proc.pageTable.selectNextRAMpteAndReplace(newPte); // Eintrag für eine ggf. zu ersetzende Seite
 			int replacePageFrameAdr = replacePte.realPageFrameAdr; // Reale Adresse einer zu ersetzenden Seite
-			// alte Seite auf Platte auslagern (vorher neuen Diskblock
-			// anfordern)
+			
+			// alte Seite auf Platte auslagern (vorher neuen Diskblock  anfordern)
 			// hier: IMMER zurückschreiben, weil keine Kopie auf der Platte
-			// bleibt
-			// (M-Bit wird also nicht benutzt!)
+			// bleibt (M-Bit wird also nicht benutzt!)
 			int newDiskBlock = allocateDiskBlock(); // Reale Adresse eines neuen Plattenblocks
 			dataTransferToDisk(replacePageFrameAdr, newDiskBlock);
+			
 			// Plattenadresse in Seitentabelle eintragen
 			replacePte.realPageFrameAdr = newDiskBlock;
 			replacePte.valid = false;
 
 			testOut("OS: getNewRAMPage " + pid + " ++ Seite " + replacePte.virtPageNum + " ist nun auf der Platte an Adresse " + replacePte.realPageFrameAdr);
+			
 			// Adresse als neue Seite zurückgeben
 			newPageFrameAdr = replacePageFrameAdr;
 		}

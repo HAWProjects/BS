@@ -66,8 +66,8 @@ public class SimulationEnv {
 		// Laufzeit abwarten
 		try {
 			Thread.sleep(simulationTime);
-		} catch (InterruptedException e) {
-		}
+		} catch (InterruptedException e) {}
+		
 		// Alle Prozesse stoppen
 		os.killAll();
 

@@ -59,29 +59,21 @@ public class Process extends Thread {
 	}
 
 	/**
-	 * Programmcode eines Prozesses: Zugriff auf Speicherseiten simulieren (nur
-	 * read)
-	 * 
+	 * Programmcode eines Prozesses: Zugriff auf Speicherseiten simulieren (nur read)
 	 */
 	public void run() {
-		int median; // Mittelwert für virtuelle Adressen
-		int bias; // Streuung um den Mittelwert
-		int virtAdr; // Virtuelle Adresse
-		int i; // Zähler
-
 		// Streuungsbereich festlegen (Anzahl Seiten)
-		bias = BIAS_FACTOR * os.getPAGE_SIZE();
+		int bias = BIAS_FACTOR * os.getPAGE_SIZE(); // Streuung um den Mittelwert
 
 		while (!isInterrupted()) {
-			// Neue Adresse bestimmen (muss im bereits geschriebenen Bereich
-			// liegen!)
-			median = (int) (processSize * Math.random());
+			// Neue Adresse bestimmen (muss im bereits geschriebenen Bereich liegen!)
+			int median = (int) (processSize * Math.random()); // Mittelwert für virtuelle Adressen
 
 			// Neue Adresse als Mittelwert für die nächsten Zugriffe verwenden
 			// (localityFactor)
-			for (i = 0; i < localityFactor; i++) {
+			for (int i = 0; i < localityFactor; i++) {
 				// Virtuelle Adresse in der "Nähe" des Mittelwerts (median) bestimmen
-				virtAdr = ((int) (2 * bias * Math.random() - bias)) + median;
+				int virtAdr = ((int)(2 * bias * Math.random() - bias)) + median;
 				// Grenzen setzen: 0 <= virtAdr <= PROGRAM_SIZE -
 				// os.getWORD_SIZE() !!
 				virtAdr = Math.min(virtAdr, processSize - os.getWORD_SIZE());

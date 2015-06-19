@@ -23,8 +23,7 @@ public class OperatingSystem {
 	 * implementiert ist!): (ein Teil des Hauptspeichers muss immer frei bleiben
 	 * (u.a. für Caching etc.), daher -PAGE_SIZE)
 	 */
-	private int MAX_NUM_OF_PROCESSES = (RAM_SIZE - PAGE_SIZE)
-			/ (MAX_RAM_PAGES_PER_PROCESS * PAGE_SIZE);
+	private int MAX_NUM_OF_PROCESSES = (RAM_SIZE - PAGE_SIZE) / (MAX_RAM_PAGES_PER_PROCESS * PAGE_SIZE);
 
 	/**
 	 * Dieser Faktor bestimmt das "Lokalitätsverhalten" eines Programms (=
@@ -211,11 +210,8 @@ public class OperatingSystem {
 	 * Alle aktiven Prozesse aus Prozessliste beenden
 	 */
 	public synchronized void killAll() {
-		Process proc;
-		int i;
-
-		for (i = 0; i < processTable.size(); i++) {
-			proc = (Process) processTable.get(i);
+		for (int i = 0; i < processTable.size(); i++) {
+			Process proc = (Process)processTable.get(i);
 			System.out.println("Prozess " + proc.pid + " wird unterbrochen!");
 			proc.interrupt();
 		}
@@ -235,33 +231,22 @@ public class OperatingSystem {
 	 *         Adresse
 	 */
 	public synchronized int write(int pid, int virtAdr, int item) {
-		int virtualPageNum; // Virtuelle Seitennummer
-		int offset; // Offset innerhalb der Seite
-		int realAddressOfItem; // Reale Adresse des Datenworts
-		Process proc; // Aktuelles Prozessobjekt
-		PageTableEntry pte; // Eintrag für die zu schreibende Seite
-
 		// übergebene Adresse prüfen
 		if ((virtAdr < 0) || (virtAdr > VIRT_ADR_SPACE - WORD_SIZE)) {
-			System.err.println("OS: write ERROR " + pid + ": Adresse "
-					+ virtAdr
-					+ " liegt außerhalb des virtuellen Adressraums 0 - "
-					+ VIRT_ADR_SPACE);
+			System.err.println("OS: write ERROR " + pid + ": Adresse " + virtAdr + " liegt außerhalb des virtuellen Adressraums 0 - " + VIRT_ADR_SPACE);
 			return -1;
 		}
 		// Seitenadresse berechnen
-		virtualPageNum = getVirtualPageNum(virtAdr);
-		offset = getOffset(virtAdr);
-		testOut("OS: write " + pid + " " + virtAdr + " " + item
-				+ " +++ Seitennr.: " + virtualPageNum + " Offset: " + offset);
+		int virtualPageNum = getVirtualPageNum(virtAdr);
+		int offset = getOffset(virtAdr);
+		testOut("OS: write " + pid + " " + virtAdr + " " + item + " +++ Seitennr.: " + virtualPageNum + " Offset: " + offset);
 
 		// Seite in Seitentabelle referenzieren
-		proc = getProcess(pid);
-		pte = proc.pageTable.getPte(virtualPageNum);
+		Process proc = getProcess(pid);
+		PageTableEntry pte = proc.pageTable.getPte(virtualPageNum);
 		if (pte == null) {
 			// Seite nicht vorhanden:
-			testOut("OS: write " + pid + " +++ Seitennr.: " + virtualPageNum
-					+ " in Seitentabelle nicht vorhanden");
+			testOut("OS: write " + pid + " +++ Seitennr.: " + virtualPageNum + " in Seitentabelle nicht vorhanden");
 			pte = new PageTableEntry();
 			pte.virtPageNum = virtualPageNum;
 			// Seitenrahmen im RAM für die neue Seite anfordern und reale
@@ -270,9 +255,7 @@ public class OperatingSystem {
 			pte.valid = true;
 			// neue Seite in Seitentabelle eintragen
 			proc.pageTable.addEntry(pte);
-			testOut("OS: write " + pid + " Neue Seite " + virtualPageNum
-					+ " in Seitentabelle eingetragen! RAM-Adr.: "
-					+ pte.realPageFrameAdr);
+			testOut("OS: write " + pid + " Neue Seite " + virtualPageNum + " in Seitentabelle eingetragen! RAM-Adr.: " + pte.realPageFrameAdr);
 		} else {
 			// Seite vorhanden: Seite valid (im RAM)?
 			if (!pte.valid) {
@@ -283,12 +266,10 @@ public class OperatingSystem {
 		// ------ Zustand: Seite ist in Seitentabelle und im RAM vorhanden
 
 		// Reale Adresse des Datenworts berechnen
-		realAddressOfItem = pte.realPageFrameAdr + offset;
+		int realAddressOfItem = pte.realPageFrameAdr + offset;
 		// Datenwort in RAM eintragen
 		writeToRAM(realAddressOfItem, item);
-		testOut("OS: write " + pid + " +++ item: " + item
-				+ " erfolgreich an virt. Adresse " + virtAdr
-				+ " geschrieben! RAM-Adresse: " + realAddressOfItem + " \n");
+		testOut("OS: write " + pid + " +++ item: " + item + " erfolgreich an virt. Adresse " + virtAdr + " geschrieben! RAM-Adresse: " + realAddressOfItem + " \n");
 		// Seitentabelle bzgl. Zugriffshistorie aktualisieren
 		pte.referenced = true;
 		// Statistische Zählung
@@ -432,13 +413,9 @@ public class OperatingSystem {
 		// im RAM löschen (mit Nullen überschreiben)
 		// Adresse als neue Seite zurückgeben
 		// ----------- Start ----------------
-		Process proc; // Aktuelles Prozessobjekt
 		int newPageFrameAdr = 0; // Reale Adresse einer neuen Seite im RAM
-		int replacePageFrameAdr = 0; // Reale Adresse einer zu ersetzenden Seite
-		int newDiskBlock = 0; // Reale Adresse eines neuen Plattenblocks
-		PageTableEntry replacePte; // Eintrag für eine ggf. zu ersetzende Seite
 
-		proc = getProcess(pid);
+		Process proc = getProcess(pid);
 		// Anforderung einer neuen RAM-Seite erfüllbar?
 		if (proc.pageTable.getSize() < MAX_RAM_PAGES_PER_PROCESS) {
 			// Ja, Seitenanforderung im RAM ist erfüllbar:
@@ -448,27 +425,23 @@ public class OperatingSystem {
 			proc.pageTable.pteRAMlistInsert(newPte);
 		} else {
 			// Nein, Seitenanforderung im RAM ist nicht erfüllbar:
-			testOut("OS: getNewRAMPage " + pid + " ++ Seitenfehler für Seite "
-					+ newPte.virtPageNum + " --> Seitenersetzungs-Algorithmus!");
+			testOut("OS: getNewRAMPage " + pid + " ++ Seitenfehler für Seite " + newPte.virtPageNum + " --> Seitenersetzungs-Algorithmus!");
 			// eine alte Seite zur Verdrängung auswählen -->
 			// Seitenersetzungs-Algorithmus
-			replacePte = proc.pageTable.selectNextRAMpteAndReplace(newPte);
-			replacePageFrameAdr = replacePte.realPageFrameAdr;
+			PageTableEntry replacePte = proc.pageTable.selectNextRAMpteAndReplace(newPte); // Eintrag für eine ggf. zu ersetzende Seite
+			int replacePageFrameAdr = replacePte.realPageFrameAdr; // Reale Adresse einer zu ersetzenden Seite
 			// alte Seite auf Platte auslagern (vorher neuen Diskblock
 			// anfordern)
 			// hier: IMMER zurückschreiben, weil keine Kopie auf der Platte
 			// bleibt
 			// (M-Bit wird also nicht benutzt!)
-			newDiskBlock = allocateDiskBlock();
+			int newDiskBlock = allocateDiskBlock(); // Reale Adresse eines neuen Plattenblocks
 			dataTransferToDisk(replacePageFrameAdr, newDiskBlock);
 			// Plattenadresse in Seitentabelle eintragen
 			replacePte.realPageFrameAdr = newDiskBlock;
 			replacePte.valid = false;
 
-			testOut("OS: getNewRAMPage " + pid + " ++ Seite "
-					+ replacePte.virtPageNum
-					+ " ist nun auf der Platte an Adresse "
-					+ replacePte.realPageFrameAdr);
+			testOut("OS: getNewRAMPage " + pid + " ++ Seite " + replacePte.virtPageNum + " ist nun auf der Platte an Adresse " + replacePte.realPageFrameAdr);
 			// Adresse als neue Seite zurückgeben
 			newPageFrameAdr = replacePageFrameAdr;
 		}
@@ -493,16 +466,8 @@ public class OperatingSystem {
 	 *         belegt
 	 */
 	private int readFromRAM(int ramAdr) {
-		Integer itemObject;
-		int result;
-
-		itemObject = (Integer) physRAM.get(new Integer(ramAdr));
-		if (itemObject == null) {
-			result = -1;
-		} else {
-			result = itemObject.intValue();
-		}
-		return result;
+		Integer itemObject = (Integer)physRAM.get(new Integer(ramAdr));
+		return itemObject == null ? -1 : itemObject.intValue();
 	}
 
 	/**
@@ -513,14 +478,10 @@ public class OperatingSystem {
 	 * @param diskAdr
 	 */
 	private void dataTransferToDisk(int ramAdr, int diskAdr) {
-
-		Integer currentWord; // aktuelles Speicherwort
+		int di = diskAdr; // aktuelle Speicherwortadresse auf der Platte
 		int ri; // aktuelle Speicherwortadresse im RAM
-		int di; // aktuelle Speicherwortadresse auf der Platte
-
-		di = diskAdr;
 		for (ri = ramAdr; ri < ramAdr + PAGE_SIZE; ri = ri + WORD_SIZE) {
-			currentWord = (Integer) physRAM.get(new Integer(ri));
+			Integer currentWord = (Integer) physRAM.get(new Integer(ri)); // aktuelles Speicherwort
 			physDisk.put(new Integer(di), currentWord);
 			di = di + WORD_SIZE;
 		}
@@ -534,13 +495,10 @@ public class OperatingSystem {
 	 * @param ramAdr
 	 */
 	private void dataTransferFromDisk(int diskAdr, int ramAdr) {
-		Integer currentWord; // aktuelles Speicherwort
-		int ri; // aktuelle Speicherwortadresse im RAM
+		int ri = ramAdr; // aktuelle Speicherwortadresse im RAM
 		int di; // aktuelle Speicherwortadresse auf der Platte
-
-		ri = ramAdr;
 		for (di = diskAdr; di < diskAdr + BLOCK_SIZE; di = di + WORD_SIZE) {
-			currentWord = (Integer) physDisk.get(new Integer(di));
+			Integer currentWord = (Integer)physDisk.get(new Integer(di)); // aktuelles Speicherwort
 			physRAM.put(new Integer(ri), currentWord);
 			ri = ri + WORD_SIZE;
 		}
@@ -556,11 +514,10 @@ public class OperatingSystem {
 		// Algorithmus:
 		// 1. Block der Freibereichsliste um PAGE_SIZE verkleinern.
 		// Falls size = 0 --> löschen!
-		FreeListBlock ramFB; // Erster Block aus Freibereichsliste
-		int freePageAdr; // Rückgabeadresse
-
-		ramFB = ramFreeList.getFirst();
-		freePageAdr = ramFB.getAdress();
+		
+		FreeListBlock ramFB = ramFreeList.getFirst(); // Erster Block aus Freibereichsliste
+		int freePageAdr = ramFB.getAdress(); // Rückgabeadresse
+		
 		// Block in Freibereichsliste aktualisieren
 		if (ramFB.getSize() == PAGE_SIZE) {
 			// Block wäre anschließend leer --> Löschen
@@ -569,9 +526,10 @@ public class OperatingSystem {
 			ramFB.setAdress(freePageAdr + PAGE_SIZE);
 			ramFB.setSize(ramFB.getSize() - PAGE_SIZE);
 		}
-		testOut("OS: Neuer Seitenrahmen (RAM page) belegt, Adresse: "
-				+ freePageAdr);
+		
+		testOut("OS: Neuer Seitenrahmen (RAM page) belegt, Adresse: " + freePageAdr);
 		testOut("OS: ramFreeList:" + ramFreeList);
+		
 		return freePageAdr;
 	}
 
@@ -589,21 +547,21 @@ public class OperatingSystem {
 		// (Eine Zusammenfassung von Freibereichsblöcken (Bereinigen der
 		// Fragmentierung) müsste
 		// zusätzlich implementiert werden!)
-		Integer nullWord; // Null-Speicherwort
-		int ri; // aktuelle Speicherwortadresse im RAM
-		FreeListBlock ramFB; // neuer FreeListBlock
-
+		
+		Integer nullWord = new Integer(0); // Null-Speicherwort
+		
 		// RAM-Seite überschreiben
-		nullWord = new Integer(0);
+		int ri; // aktuelle Speicherwortadresse im RAM
 		for (ri = ramAdr; ri < ramAdr + PAGE_SIZE; ri = ri + WORD_SIZE) {
 			physRAM.put(new Integer(ri), nullWord);
 		}
+		
 		// In Freibereichsliste eintragen
-		ramFB = new FreeListBlock(ramAdr, PAGE_SIZE);
+		FreeListBlock ramFB = new FreeListBlock(ramAdr, PAGE_SIZE); // neuer FreeListBlock
 		ramFreeList.add(ramFB);
 		Collections.sort(ramFreeList);
-		testOut("OS: Seitenrahmen (RAM page) wurde freigegeben, Adresse "
-				+ ramAdr);
+		
+		testOut("OS: Seitenrahmen (RAM page) wurde freigegeben, Adresse " + ramAdr);
 		testOut("OS: ramFreeList:" + ramFreeList);
 	}
 
@@ -616,18 +574,14 @@ public class OperatingSystem {
 	 */
 	private int allocateDiskBlock() {
 		// Algorithmus:
-		// 1. Block der Freibereichsliste um BLOCK_SIZE verkleinern. Falls size
-		// = 0 --> löschen!
-		FreeListBlock diskFB; // Erster Block aus Freibereichsliste
-		int freeBlockAdr; // Rückgabeadresse
-
-		diskFB = (FreeListBlock) diskFreeList.getFirst();
+		// 1. Block der Freibereichsliste um BLOCK_SIZE verkleinern. Falls size = 0 --> löschen!
+		FreeListBlock diskFB = (FreeListBlock) diskFreeList.getFirst(); // Erster Block aus Freibereichsliste
 		if ((diskFreeList.size() == 1) && (diskFB.getSize() == BLOCK_SIZE)) {
 			// Nur noch ein freier Block vorhanden --> Platte voll!
 			testOut("OS: allocateDiskBlock: Platte ist voll! --------------------------------------- ");
 			return -1;
 		} else {
-			freeBlockAdr = diskFB.getAdress();
+			int freeBlockAdr = diskFB.getAdress();
 			// Block in Freibereichsliste aktualisieren
 			if (diskFB.getSize() == BLOCK_SIZE) {
 				// Block wäre anschließend leer --> Löschen
@@ -652,21 +606,21 @@ public class OperatingSystem {
 		// Plattenblock mit Nullen überschreiben (Security!) und neuen
 		// Freibereichsblock erzeugen
 		// (Eine Zusammenfassung von Freibereichsblöcken (Bereinigen der
-		// Fragmentierung) müsste
-		// zusätzlich implementiert werden!)
-		Integer nullWord; // Null-Speicherwort
-		int di; // aktuelle Speicherwortadresse auf der Platte
-		FreeListBlock diskFB; // neuer FreeListBlock
+		// Fragmentierung) müsste zusätzlich implementiert werden!)
+		
+		Integer nullWord = new Integer(0); // Null-Speicherwort
 
 		// Plattenblock überschreiben
-		nullWord = new Integer(0);
+		int di; // aktuelle Speicherwortadresse auf der Platte
 		for (di = diskAdr; di < diskAdr + BLOCK_SIZE; di = di + WORD_SIZE) {
 			physDisk.put(new Integer(di), nullWord);
 		}
+		
 		// In Freibereichsliste eintragen
-		diskFB = new FreeListBlock(diskAdr, BLOCK_SIZE);
+		FreeListBlock diskFB = new FreeListBlock(diskAdr, BLOCK_SIZE); // neuer FreeListBlock
 		diskFreeList.add(diskFB);
 		Collections.sort(diskFreeList);
+		
 		testOut("OS: Plattenblock " + diskAdr + " wurde freigegeben!");
 	}
 
@@ -690,10 +644,8 @@ public class OperatingSystem {
 		i = Math.max(1, i);
 		i = Math.min(i, MAX_NO_OF_PAGES);
 		MAX_RAM_PAGES_PER_PROCESS = i;
-		MAX_NUM_OF_PROCESSES = (RAM_SIZE - PAGE_SIZE)
-				/ (MAX_RAM_PAGES_PER_PROCESS * PAGE_SIZE);
-		testOut("OS: MAX_RAM_PAGES_PER_PROCESS: " + MAX_RAM_PAGES_PER_PROCESS
-				+ " MAX_NUM_OF_PROCESSES:" + MAX_NUM_OF_PROCESSES);
+		MAX_NUM_OF_PROCESSES = (RAM_SIZE - PAGE_SIZE) / (MAX_RAM_PAGES_PER_PROCESS * PAGE_SIZE);
+		testOut("OS: MAX_RAM_PAGES_PER_PROCESS: " + MAX_RAM_PAGES_PER_PROCESS + " MAX_NUM_OF_PROCESSES:" + MAX_NUM_OF_PROCESSES);
 	}
 
 	/**
@@ -774,8 +726,7 @@ public class OperatingSystem {
 	 * @param alg
 	 *            Enum-Wert ImplementedReplacementAlgorithms
 	 */
-	public synchronized void setREPLACEMENT_ALGORITHM(
-			ImplementedReplacementAlgorithms alg) {
+	public synchronized void setREPLACEMENT_ALGORITHM(ImplementedReplacementAlgorithms alg) {
 		replacementAlgorithm = alg;
 	}
 

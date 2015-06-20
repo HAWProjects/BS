@@ -50,9 +50,9 @@ public class PageTable {
 	}
 
 	/**
-	 * Rï¿½ckgabe: Seitentabelleneintrag pte (PageTableEntry) fï¿½r die ï¿½bergebene
-	 * virtuelle Seitennummer (VPN = Virtual Page Number) oder null, falls Seite
-	 * nicht existiert
+	 * Rï¿½ckgabe: Seitentabelleneintrag pte (PageTableEntry) fï¿½r die
+	 * ï¿½bergebene virtuelle Seitennummer (VPN = Virtual Page Number) oder
+	 * null, falls Seite nicht existiert
 	 */
 	public PageTableEntry getPte(int vpn) {
 		if ((vpn < 0) || (vpn >= pageTable.size())) {
@@ -87,8 +87,8 @@ public class PageTable {
 	}
 
 	/**
-	 * Eine Seite, die sich im RAM befindet, anhand der pteRAMlist auswï¿½hlen und
-	 * zurï¿½ckgeben
+	 * Eine Seite, die sich im RAM befindet, anhand der pteRAMlist auswï¿½hlen
+	 * und zurï¿½ckgeben
 	 */
 	public PageTableEntry selectNextRAMpteAndReplace(PageTableEntry newPte) {
 		if (os.getReplacementAlgorithm() == OperatingSystem.ImplementedReplacementAlgorithms.CLOCK) {
@@ -110,19 +110,19 @@ public class PageTable {
 		PageTableEntry pte; // Auswahl
 
 		pte = (PageTableEntry) pteRAMlist.getFirst();
-		os.testOut("Prozess " + pid + ": FIFO-Algorithmus hat pte ausgewï¿½hlt: "
-				+ pte.virtPageNum);
+		os.testOut("Prozess " + pid
+				+ ": FIFO-Algorithmus hat pte ausgewï¿½hlt: " + pte.virtPageNum);
 		pteRAMlist.removeFirst();
 		pteRAMlist.add(newPte);
 		return pte;
 	}
 
 	/**
-	 * CLOCK-Algorithmus (Second-Chance): Nï¿½chstes Listenelement, ausgehend vom
-	 * aktuellen Index, mit Referenced-Bit = 0 (false) auswï¿½hlen Sonst R-Bit auf
-	 * 0 setzen und nï¿½chstes Element in der pteRAMlist untersuchen. Anschlieï¿½end
-	 * die ausgewï¿½hlte Seite durch die neue Seite (newPte) am selben Listenplatz
-	 * ersetzen
+	 * CLOCK-Algorithmus (Second-Chance): Nï¿½chstes Listenelement, ausgehend
+	 * vom aktuellen Index, mit Referenced-Bit = 0 (false) auswï¿½hlen Sonst
+	 * R-Bit auf 0 setzen und nï¿½chstes Element in der pteRAMlist untersuchen.
+	 * Anschlieï¿½end die ausgewï¿½hlte Seite durch die neue Seite (newPte) am
+	 * selben Listenplatz ersetzen
 	 */
 	private PageTableEntry clockAlgorithm(PageTableEntry newPte) {
 		PageTableEntry pte; // Aktuell untersuchter Seitentabelleneintrag
@@ -148,17 +148,28 @@ public class PageTable {
 		// Index auf Nachfolger setzen
 		incrementPteRAMlistIndex();
 		os.testOut("Prozess " + pid
-				+ ": CLOCK-Algorithmus hat pte ausgewï¿½hlt: " + pte.virtPageNum
-				+ "  Neuer pteRAMlistIndex ist " + pteRAMlistIndex);
+				+ ": CLOCK-Algorithmus hat pte ausgewï¿½hlt: "
+				+ pte.virtPageNum + "  Neuer pteRAMlistIndex ist "
+				+ pteRAMlistIndex);
 
 		return pte;
 	}
 
 	/**
-	 * RANDOM-Algorithmus: Zufï¿½llige Auswahl
+	 * RANDOM-Algorithmus: Zufaellige Auswahl
 	 */
 	private PageTableEntry randomAlgorithm(PageTableEntry newPte) {
-		// ToDo
+		PageTableEntry pte; // Aktuell untersuchter Seitentabelleneintrag
+
+		// zufälliger index bestimmen
+		Random rand = new Random();
+		int index = rand.nextInt(pteRAMlist.size());
+
+		pte = (PageTableEntry) pteRAMlist.get(index);
+
+		// Alte Seite gegen neue in pteRAMlist austauschen
+		pteRAMlist.remove(index);
+		pteRAMlist.add(index, newPte);
 		
 		return pte;
 	}

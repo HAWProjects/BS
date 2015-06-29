@@ -1,0 +1,26 @@
+5.a)
+	Die Seitenfehlerrate ist unserer Ansicht nach plausibel.
+	Wir erklären uns das so, da pro Prozess 20 Seiten benötigt werden, kann man an der ersten
+	Versuchsreihe erkennen, dass nur 10 (also die Hälfte) davon gleichzeitig im RAM sein können.
+	Bei einem Lokalitätsfaktor von 1 heißt das, dass nach jedem Zugriff auf eine Seite eine neue
+	Seite benötigt wird. Im Mittel wird dies natürlich darauf hinauslaufen, dass wir zu 50 % auf
+	eine Seite im RAM und zu 50 % auf eine Seite auf der Festplatte zugreifen müssen.
+	An der letzten Versuchsreihe sieht man, dass alle 20 Seiten gleichzeitig im RAM sind und
+	dementsprechend keine Seitenfehler auftreten.
+	Aus den Versuchen 1 bis 4 kann auch auf die Effektivität bei einem bestimmten Lokalitätsfaktor
+	geschlossen werden. Je höher der Faktor ist, desto geringer fällt die Seitenfehlerrate aus.
+	Das liegt daran, dass aufeinanderfolgende Zugriffe öfter auf dieselbe Seite zugreifen.
+	
+5.b)
+	                  10,1 | 10,10 | 10,100 | 10,1000 | 15,10 | 20,10 |
+	RANDOM zu CLOCK :  0,4 |   9,2 |   22,5 |    22,9 |   3,9 |   0,0 |
+	CLOCK  zu FIFO  :  0,2 |   3,0 |    6,3 |     3,1 |   5,3 |   0,0 |
+	FIFO   zu RANDOM:  0,2 |   5,6 |   12,9 |    16,0 |   1,5 |   0,0 |
+	
+5.c)
+	Zur Leistungssteigerung bedarf es einer größeren Anzahl an Seiten im Arbeitsspeicher für den
+	entsprechenden Prozess. 
+	Andere Programme deaktivieren, damit Seiten frei werden und dem entsprechendem Prozess mehr 
+	Seiten zugeordnet werden können.
+	Hauptspeicher vergrößern und somit die maximale Seitenanzahl erhöhen.
+	

@@ -52,7 +52,7 @@ public class SimulationEnv {
 
 		// Testausgaben erw�nscht? Wenn true, dann simulationTime auf max. 200
 		// ms setzen!
-		os.setTestMode(true);
+		os.setTestMode(false);
 
 		// ------------------------- Parameter setzen Ende
 		// -----------------------------------------------

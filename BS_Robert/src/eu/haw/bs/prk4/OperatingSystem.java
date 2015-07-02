@@ -235,11 +235,7 @@ public class OperatingSystem {
 	 *         Adresse
 	 */
 	public synchronized int write(int pid, int virtAdr, int item) {
-		int virtualPageNum; // Virtuelle Seitennummer
-		int offset; // Offset innerhalb der Seite
-		int realAddressOfItem; // Reale Adresse des Datenworts
-		Process proc; // Aktuelles Prozessobjekt
-		PageTableEntry pte; // Eintrag fï¿½r die zu schreibende Seite
+
 
 		// ï¿½bergebene Adresse prï¿½fen
 		if ((virtAdr < 0) || (virtAdr > VIRT_ADR_SPACE - WORD_SIZE)) {
@@ -250,14 +246,14 @@ public class OperatingSystem {
 			return -1;
 		}
 		// Seitenadresse berechnen
-		virtualPageNum = getVirtualPageNum(virtAdr);
-		offset = getOffset(virtAdr);
+		int virtualPageNum = getVirtualPageNum(virtAdr);
+		int offset = getOffset(virtAdr);
 		testOut("OS: write " + pid + " " + virtAdr + " " + item
 				+ " +++ Seitennr.: " + virtualPageNum + " Offset: " + offset);
 
 		// Seite in Seitentabelle referenzieren
-		proc = getProcess(pid);
-		pte = proc.pageTable.getPte(virtualPageNum);
+		Process proc = getProcess(pid);
+		PageTableEntry pte = proc.pageTable.getPte(virtualPageNum);
 		if (pte == null) {
 			// Seite nicht vorhanden:
 			testOut("OS: write " + pid + " +++ Seitennr.: " + virtualPageNum
@@ -283,7 +279,7 @@ public class OperatingSystem {
 		// ------ Zustand: Seite ist in Seitentabelle und im RAM vorhanden
 
 		// Reale Adresse des Datenworts berechnen
-		realAddressOfItem = pte.realPageFrameAdr + offset;
+		int realAddressOfItem = pte.realPageFrameAdr + offset;
 		// Datenwort in RAM eintragen
 		writeToRAM(realAddressOfItem, item);
 		testOut("OS: write " + pid + " +++ item: " + item
@@ -311,7 +307,7 @@ public class OperatingSystem {
 		int offset; // Offset innerhalb der Seite
 		int realAddressOfItem; // Reale Adresse des Datenworts
 		Process proc; // Aktuelles Prozessobjekt
-		PageTableEntry pte; // Eintrag für die zu lesende Seite
+		PageTableEntry pte; // Eintrag fï¿½r die zu lesende Seite
 		
 		// Uebergebene Adresse pruefen
 		if ((virtAdr < 0) || (virtAdr > VIRT_ADR_SPACE - WORD_SIZE)) {
@@ -386,7 +382,7 @@ public class OperatingSystem {
 	 * @return Die entsprechende virtuelle Seitennummer
 	 */
 	private int getVirtualPageNum(int virtAdr) {
-		return virtAdr / RAM_SIZE;
+		return virtAdr / PAGE_SIZE;
 	}
 
 	/**

@@ -315,20 +315,8 @@ public class OperatingSystem {
 		Process proc = getProcess(pid);
 		PageTableEntry pte = proc.pageTable.getPte(virtualPageNum);
 		if (pte == null) {
-			// Seite nicht vorhanden:
-			testOut("OS: read " + pid + " +++ Seitennr.: " + virtualPageNum + " in Seitentabelle nicht vorhanden");
-			
-			pte = new PageTableEntry();
-			pte.virtPageNum = virtualPageNum;
-			
-			// Seitenrahmen im RAM für die neue Seite anfordern und reale (RAM-)SeitenAdresse eintragen
-			pte.realPageFrameAdr = getNewRAMPage(pte, pid);
-			pte.valid = true;
-			
-			// neue Seite in Seitentabelle eintragen
-			proc.pageTable.addEntry(pte);
-			
-			testOut("OS: read " + pid + " Neue Seite " + virtualPageNum + " in Seitentabelle eingetragen! RAM-Adr.: " + pte.realPageFrameAdr);
+			// Seite nicht vorhanden
+			return -1;
 		} else {
 			// Seite vorhanden: Seite valid (also im RAM)?
 			if (!pte.valid) {

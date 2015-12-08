@@ -19,24 +19,24 @@ public class Kasse {
 	public void bezahlen() throws InterruptedException {
 		myLock.lockInterruptibly();
 		try {
-			System.out.println("[*] " + Thread.currentThread().getName() + " bezahlt an " + myName + "!");
+			System.out.println("[* " + laengeDerSchlange() + "] " + Thread.currentThread().getName() + " bezahlt an " + myName + "!");
 			Thread.sleep(1000);
 		} finally {
 			myLock.unlock();
 		}
 	}
 	
-	public int laengeDerSchlange() throws InterruptedException {
+	public int laengeDerSchlange() {
 		return myWarteschlange;
 	}
 	
 	public void anstellen() {
 		myWarteschlange++;
-		System.out.println("[+] " + Thread.currentThread().getName() + " hat sich an " + myName + " angestellt!");
+		System.out.println("[+ " + laengeDerSchlange() + "] " + Thread.currentThread().getName() + " hat sich an " + myName + " angestellt!");
 	}
 	
 	public void verlassen() {
 		myWarteschlange--;
-		System.out.println("[-] " + Thread.currentThread().getName() + " hat " + myName + " verlassen!");
+		System.out.println("[- " + laengeDerSchlange() + "] " + Thread.currentThread().getName() + " hat " + myName + " verlassen!");
 	}
 }
